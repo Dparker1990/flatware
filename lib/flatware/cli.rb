@@ -34,8 +34,9 @@ module Flatware
       end
       log "bossman"
       $0 = 'flatware sink'
-      Sink.start_server jobs
+      sink = Sink.start_server jobs
       Process.waitall
+      # exit(sink.all_passed? ? 0 : 1)
     end
 
     worker_option

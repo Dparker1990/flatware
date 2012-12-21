@@ -50,6 +50,7 @@ Feature: Output
     2 scenarios (1 failed, 1 undefined)
     6 steps (1 failed, 5 undefined)
     """
+    And the exit status should not be 0
 
   Scenario: backgrounds
     Given the following scenario:

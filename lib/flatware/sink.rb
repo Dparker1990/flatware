@@ -30,9 +30,13 @@ module Flatware
           summarize
           summarize_remaining
         end
-
         before_firing { listen }
         Flatware.close
+        self
+      end
+
+      def all_passed?
+        checkpoints.all? &:passed?
       end
 
       def listen

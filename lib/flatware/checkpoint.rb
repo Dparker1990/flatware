@@ -1,6 +1,11 @@
 module Flatware
   class Checkpoint
     attr_reader :steps, :scenarios
+
+    def passed?
+      steps.all? &:passed?
+    end
+
     def initialize(steps, scenarios)
       @steps, @scenarios = serialize_steps(steps), serialize_scenarios(scenarios)
     end
