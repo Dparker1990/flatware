@@ -54,10 +54,13 @@ Given 'a sleepy cucumber suite' do
   step 'a cucumber suite with two features that each sleep for 1 second'
 end
 
-When /^I time the suite with (cucumber|flatware)$/ do |runner|
+runners = Regexp.union %w[cucumber flatware fail-fast]
+
+When /^I time the suite with (#{runners})$/ do |runner|
   @durations ||= {}
   commands = {
     'cucumber' => 'cucumber --format progress',
+    'fail-fast' => 'flatware cucumber --fail-fast',
     'flatware' => 'flatware cucumber'
   }
   @durations[runner] = duration do
@@ -66,8 +69,9 @@ When /^I time the suite with (cucumber|flatware)$/ do |runner|
   assert_exit_status 0
 end
 
-Then 'flatware is faster' do
-  @durations['flatware'].should < @durations['cucumber']
+Then /^(#{runners}) is the fastest$/ do |runner|
+  @durations.should have_at_least(1).value
+  @durations[runner].should == @durations.values.min
 end
 
 When /^I run flatware(?: with "([^"]+)")?$/ do |args|
@@ -136,4 +140,7 @@ end
 
 Then 'I see log messages' do
   assert_partial_output 'flatware options:', all_output
+end
+
+Then 'the failure list only includes one feature' do
 end
