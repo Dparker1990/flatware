@@ -1,14 +1,15 @@
 module Flatware
   class CheckpointHandler
-    def initialize(out, fails_fast)
+    attr_reader :formatter, :checkpoints
+    def initialize(formatter, fails_fast)
       @fail_fast = fails_fast
-      @out = out
+      @formatter = formatter
       @checkpoints = []
     end
 
     def handle!(checkpoint)
-      @checkpoints << checkpoint
-      if checkpoint.failures? && @fail_fast
+      checkpoints << checkpoint
+      if checkpoint.failures? && fail_fast?
         Fireable::kill # Killing everybody
         @done = true
       end
@@ -18,10 +19,14 @@ module Flatware
       @done
     end
 
+    def fail_fast?
+      @fail_fast
+    end
+
     def summarize
       steps = @checkpoints.map(&:steps).flatten
       scenarios = @checkpoints.map(&:scenarios).flatten
-      Summary.new(steps, scenarios, @out).summarize
+      formatter.summarize(steps, scenarios)
     end
   end
 end
